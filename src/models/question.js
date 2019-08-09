@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('../config/mongoose')
 
 const QuestionSchema = mongoose.Schema({
     title:{
@@ -14,10 +14,7 @@ const QuestionSchema = mongoose.Schema({
 
     },
     results: {
-        type: [{
-            inputs: {type: [{ type: String }]},
-            output: {type: String}
-        }],
+        type: Array,
         required:true
     }
 })
