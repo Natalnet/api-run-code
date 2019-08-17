@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 //rotas
 require('./routes')(app)
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3002
 app.listen(PORT,()=>{
     console.log(`listen on port ${PORT}`)
 })
