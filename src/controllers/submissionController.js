@@ -1,10 +1,12 @@
 const {c, cpp, node, python, java} = require('compile-run')
 const path = require('path')
+const {URL_GCC} = require('../env')
 
 class SubmissionController{
     async exec(req,res){
     	try{
 			let { codigo,linguagem,results } = req.body;
+			console.log(codigo);
 			let totalTestes = results.length
     		let totalCertas =0
 			console.log('vetor de testes:');
@@ -13,14 +15,12 @@ class SubmissionController{
 		    let options = {
 		    	timeout         : 10000,
 		    	compileTimeout  : 10000,
-		    	stdin:''
+		    	stdin:'',
+		    	compilationPath : linguagem === 'cpp'?URL_GCC:''
 		    }
 		    let resp_teste=''
 		    let erro =''
-		    let someErro= false
-		    const pathGCC = process.env.URL_GCC || path.normalize('C:/Program Files/CodeBlocks/MinGW/bin/gcc.exe')
-	    	options.compilationPath = linguagem === 'cpp'?pathGCC:''
-		    
+		    let someErro= false		    
 		    console.log('total de testes: '+ totalTestes);
 		    for(let i=0 ; i < totalTestes ; i++ ){
 		    	options.stdin = results[i].inputs
