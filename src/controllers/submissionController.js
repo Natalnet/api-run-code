@@ -14,7 +14,7 @@ class SubmissionController{
 			let info=[];
 		    let options = {
 		    	timeout         : 10000,
-		    	compileTimeout  : 10000,
+		    	compileTimeout  : 20000,
 		    	stdin:'',
 		    	compilationPath : linguagem === 'cpp'?URL_GCC:''
 		    }
@@ -22,7 +22,7 @@ class SubmissionController{
 		    let erro =''
 		    let someErro= false		    
 		    console.log('total de testes: '+ totalTestes);
-		    for(let i=0 ; i < totalTestes ; i++ ){
+		    for(let i in results){
 		    	options.stdin = results[i].inputs
 		    	if(linguagem==='javascript'){
 		    		let codigoComFuncoesJs = implementaFuncoesJS(codigo,options.stdin)
@@ -41,10 +41,15 @@ class SubmissionController{
 		    	}
 		    	//retira todos caracteres especiais '\r'
 		    	results[i].saidaResposta = resp_teste.stdout.split('\r').join('')
-		    	//retira o caractere especial '\n' caso seja o último caractere'
-				results[i].saidaResposta = results[i].saidaResposta[results[i].saidaResposta.length-1]==='\n'?results[i].saidaResposta.slice(0,-1):results[i].saidaResposta
-				//retira o caractere especial '\n' caso seja o último caractere'
-				results[i].output = results[i].output[results[i].output.length-1]==='\n'?results[i].output.slice(0,-1):results[i].output
+
+				//retira todos espaçoes vazios do lado direito de cada linha do código
+				results[i].saidaResposta = results[i].saidaResposta.split('\n').map(row=>row.replace(/\s+$/,'')).join('')
+				results[i].output = results[i].output.split('\n').map(row=>row.replace(/\s+$/,'')).join('')
+
+		    	//retira os caractere especiais '\n' do final do código'
+				results[i].saidaResposta = results[i].saidaResposta.replace(/\n+$/,'')
+				results[i].output = results[i].output.replace(/\n+$/,'')
+
 				//verifica se a saída de teste bateu com a saída do programa
 				results[i].isMatch = results[i].output === results[i].saidaResposta;
 				console.log(`---------${i +1}° teste--------:\nEntrada(s) de teste:\n${options.stdin}Saída esperada p/ teste:\n${results[i].output}\nSaída do seu programa:\n${results[i].saidaResposta}\n-------fim da execução-----\n\n`);
@@ -69,14 +74,14 @@ class SubmissionController{
 		    console.log(results)
 		    const percentualAcerto = (totalCertas/totalTestes*100).toFixed(2)
 			//verifica se todos os erros são iguais, para mostrar só um erro e não o mesmo erro para cada caso de teste
-			if(todosIguais(info)){
+			/*if(todosIguais(info)){
 		  		info = info[0].split('\n')
 		  		info.shift()
 		  		info = info.join('\n')
 		  		info = info.replace('\n//-----fim da execução------\n\n','')
 		  	}else{
 		  		info = info.join('')
-		  	}
+		  	}*/
 	    	return res.status(200).json({results,info,percentualAcerto,someErro})
     	}
     	catch(err){
