@@ -43,8 +43,8 @@ class SubmissionController{
 		    	results[i].saidaResposta = resp_teste.stdout.split('\r').join('')
 
 				//retira todos espaçoes vazios do lado direito de cada linha do código
-				results[i].saidaResposta = results[i].saidaResposta.split('\n').map(row=>row.replace(/\s+$/,'')).join('')
-				results[i].output = results[i].output.split('\n').map(row=>row.replace(/\s+$/,'')).join('')
+				results[i].saidaResposta = results[i].saidaResposta.split('\n').map(row=>row.replace(/\s+$/,'')).join('\n')
+				results[i].output = results[i].output.split('\n').map(row=>row.replace(/\s+$/,'')).join('\n')
 
 		    	//retira os caractere especiais '\n' do final do código'
 				results[i].saidaResposta = results[i].saidaResposta.replace(/\n+$/,'')
