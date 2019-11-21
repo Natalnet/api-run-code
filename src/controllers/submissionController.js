@@ -16,16 +16,16 @@ class SubmissionController{
     		let totalCertas =0
 			console.log('vetor de testes:');
 			console.log(results);
-			let erros=[];
 		    let options = {
-		    	timeout         : 10000,
-		    	compileTimeout  : 20000,
+		    	timeout         : 3000,
+		    	compileTimeout  : 10000,
 		    	stdin:'',
 		    	compilationPath : linguagem === 'cpp'?URL_GCC:''
 		    }
 		    let resp_teste=''
-		    let erro =''
-		    let someErro= false		    
+		    let algumErro= false
+		    let erro =''  
+		    let descriptionErro = ''
 		    console.log('total de testes: '+ totalTestes);
 		    for(let i in results){
 		    	options.stdin = results[i].inputs
@@ -38,11 +38,18 @@ class SubmissionController{
 		    	}
 		    	else if(linguagem==='cpp'){
 		    		resp_teste = await cpp.runSource(codigo,options)
-		    		/*console.log('resp_teste:');
-		    		console.log(resp_teste);*/
+		    		console.log('resp_teste:');
+		    		console.log(resp_teste);
 		    		//trata erro cpp
 		    		erro = resp_teste.stderr?trataErroCPP(resp_teste.stderr):''
 		    	}
+			    if(resp_teste.errorType==='compile-time'){
+			    	descriptionErro = `${erro && erro+'\n'}errorType: ${resp_teste.errorType}}`
+			    	return res.status(200).json({results,percentualAcerto:0,descriptionErro})
+			    }
+
+		    	//verifica se deu algum erro de compilação
+
 		    	//retira todos caracteres especiais '\r'
 		    	results[i].saidaResposta = resp_teste.stdout?resp_teste.stdout.split('\r').join(''):''
 				//retira todos espaçoes vazios do lado direito de cada linha do código
@@ -54,24 +61,26 @@ class SubmissionController{
 				//verifica se a saída de teste bateu com a saída do programa
 				results[i].isMatch = results[i].output === results[i].saidaResposta;
 				//console.log(`---------${i +1}° teste--------:\nEntrada(s) de teste:\n${options.stdin}Saída esperada p/ teste:\n${results[i].output}\nSaída do seu programa:\n${results[i].saidaResposta}\n-------fim da execução-----\n\n`);
-		    	if(erro){
-		    		someErro = true
+		    	if(erro || resp_teste.errorType){
+		    		algumErro = true
 		    		console.log('---tipo do erro---');
-		    		console.log(erro);
+		    		console.log(`${erro}\nerrorType: ${resp_teste.errorType}`);
 		    		console.log('-------------------');
 			    	results[i].stderr = erro;
 			    	results[i].errorType = resp_teste.errorType;
 			    	results[i].exitCode = resp_teste.exitCode;
 			    	results[i].memoryUsage = resp_teste.memoryUsage;
 			    	results[i].cpuUsage = resp_teste.cpuUsage;
-		    		erros.push(`${results[i].stderr}\nerrorType: ${results[i].errorType}\nexitCode: ${results[i].exitCode}`)
+					results[i].errorType = resp_teste.errorType || '';
+					results[i].descriptionErro = `${results[i].stderr && results[i].stderr+'\n'}errorType: ${results[i].errorType}`
+
 		    	}
 		    	totalCertas = results[i].isMatch && !erro?totalCertas+1:totalCertas
 		    }
-		    console.log(results)
+		    //console.log(results)
 		    const percentualAcerto = (totalCertas/totalTestes*100).toFixed(2)
 			//verifica se todos os erros são iguais, para mostrar só um erro e não o mesmo erro para cada caso de teste
-			const descriptionErro = erros.length>0 && todosIguais(erros)?erros[0]:null
+			descriptionErro = algumErro && todosIguais(results.map(result=>result.descriptionErro || ''))?results[0].descriptionErro:false
 	    	return res.status(200).json({results,percentualAcerto,descriptionErro})
     	}
     	catch(err){
