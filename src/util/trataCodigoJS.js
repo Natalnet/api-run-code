@@ -4,14 +4,15 @@ module.exports = (codigo,inputs_testes)=>{
 	vetor_teste = vetor_teste.map(val => `'${val}'`)
 	// verifica quais valores podem ser convertidos para float
 	//vetor_teste = vetor_teste.map(val => !isNaN(val)?parseFloat(val):val)
-	console.log('-----vetor de testes que a função recebe---')
+	/*console.log('-----vetor de testes que a função recebe---')
 	console.log(vetor_teste)
-	console.log('-------------------------------------------');
+	console.log('-------------------------------------------');*/
 	vetor_teste = `[${vetor_teste.toString()}]`
+	console.log(vetor_teste);
 	const s = ''+
 	`let VETOR_TESTES = ${vetor_teste}\n`+
 	"let INDECE_VETOR = 0\n"+
-	"const prompt = () => {\n"+
+	"function prompt(){\n"+
 		"let res = VETOR_TESTES[INDECE_VETOR]\n"+
 		"INDECE_VETOR++\n"+
 		"return res\n"+
