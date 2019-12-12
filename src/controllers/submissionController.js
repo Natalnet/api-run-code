@@ -26,9 +26,7 @@ class SubmissionController{
 
 		    //execuções assíncronas
 		    resp_testes = await Promise.all(results.map((result,i)=>{
-
 		    	console.log(`Teste: ${i+1}`);
-
 		    	if(linguagem==='javascript'){
 					return node.runSource(trataCodigoJS(codigo,result.inputs),{
 				    	timeout : timeout,
@@ -37,7 +35,7 @@ class SubmissionController{
 		    	}
 		    	else if(linguagem==='cpp'){
 			    	return cpp.runSource(codigo,{
-				    	timeout         : 5000,
+				    	timeout         : timeout,
 				    	compileTimeout  : 60000,
 				    	stdin           : result.inputs,
 				    	compilationPath : URL_GCC
@@ -71,6 +69,7 @@ class SubmissionController{
 		    
 		    results = resp_testes.map((resp_teste,i)=>{
 		    	const result={}
+		    	result.inputs = results[i].inputs
 		    	//retira todos caracteres especiais '\r'
 		    	result.saidaResposta = resp_teste.stdout?resp_teste.stdout.split('\r').join(''):''
 				//retira todos espaçoes vazios do lado direito de cada linha do código
@@ -79,10 +78,7 @@ class SubmissionController{
 		    	//retira os caractere especiais '\n' do final do código'
 				result.saidaResposta = result.saidaResposta.replace(/\n+$/,'')
 				result.output = result.output.replace(/\n+$/,'')
-		
 				//console.log(`---------${i +1}° teste--------:\nEntrada(s) de teste:\n${options.stdin}Saída esperada p/ teste:\n${results[i].output}\nSaída do seu programa:\n${results[i].saidaResposta}\n-------fim da execução-----\n\n`);
-		    	
-		    	
 		    	if(linguagem==='javascript'){
 		    		erro = resp_teste.stderr?trataErroJS(resp_teste.stderr):''
 		    	}
@@ -112,7 +108,7 @@ class SubmissionController{
 		    //console.log(results)
 		    const percentualAcerto = (totalCertas/totalTestes*100).toFixed(2)
 			//verifica se todos os erros são iguais, para mostrar só um erro e não o mesmo erro para cada caso de teste
-			descriptionErro = algumErro && todosIguais(results.map(result=>result.descriptionErro || ''))?results[0].descriptionErro:false
+			descriptionErro = algumErro && todosIguais(results.map(result=>result.descriptionErro))?results[0].descriptionErro:false
 		    
 		    const end = new Date()
 		    console.log(`tempo gasto: ${((end-begin)/1000).toFixed(2)} s`);
