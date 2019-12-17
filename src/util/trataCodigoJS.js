@@ -18,7 +18,7 @@ module.exports = (codigo,inputs_testes)=>{
 		"return res\n"+
 	"}\n"+
 	"const alert = (value) =>{\n"+
-		"console.log(value.toString())\n"+
+		"process.stdout.write(value.toString())\n"+
 	"}\n"+
 	codigo;
 	//console.log(s);

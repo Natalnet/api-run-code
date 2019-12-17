@@ -104,7 +104,8 @@ class SubmissionController{
 
 		    	return result
 		    })
-		    console.log(resp_testes);
+		    console.log('--resp_testes:--');
+		    console.log(results);
 		    //console.log(results)
 		    const percentualAcerto = (totalCertas/totalTestes*100).toFixed(2)
 			//verifica se todos os erros são iguais, para mostrar só um erro e não o mesmo erro para cada caso de teste
