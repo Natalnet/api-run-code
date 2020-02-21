@@ -27,4 +27,6 @@ route.post('/apiCompiler',SubmissionController.exec);
 
 */
 
+route.get('/', (req,res) => res.send('Its up!!!'))
+
 module.exports = (app) => app.use(route)
