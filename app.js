@@ -1,8 +1,8 @@
 var fs = require('fs');
 var http = require('http');
 var https = require('https');
-var privateKey  = fs.readFileSync('/etc/letsencrypt/live/igorosberg.tk/privkey.pem', 'utf8');
-var certificate = fs.readFileSync('/etc/letsencrypt/live/igorosberg.tk/fullchain.pem', 'utf8');
+var privateKey  = fs.readFileSync('/etc/letsencrypt/live/exec.lop.ect.ufrn.br/privkey.pem', 'utf8');
+var certificate = fs.readFileSync('/etc/letsencrypt/live/exec.lop.ect.ufrn.br/fullchain.pem', 'utf8');
 
 var credentials = {key: privateKey, cert: certificate};
 var express = require('express');
