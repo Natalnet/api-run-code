@@ -12,8 +12,6 @@ class SubmissionController{
     		const begin = new Date()
 
 			let { codigo,linguagem,results } = req.body;
-			console.log(`linguagem: ${linguagem}`);
-			console.log(codigo);
 			let totalTestes = results.length
     		let totalCertas =0
     		const timeout = 3000
@@ -21,12 +19,9 @@ class SubmissionController{
 		    let algumErro= false
 		    let erro =''  
 		    let descriptionErro = ''
-		    console.log('testes: ');
-		    console.log(results);
 
 		    //execuções assíncronas
 		    resp_testes = await Promise.all(results.map((result,i)=>{
-		    	console.log(`Teste: ${i+1}`);
 		    	if(linguagem==='javascript'){
 					return node.runSource(trataCodigoJS(codigo,result.inputs),{
 				    	timeout : timeout,
@@ -78,7 +73,6 @@ class SubmissionController{
 		    	//retira os caractere especiais '\n' do final do código'
 				result.saidaResposta = result.saidaResposta.replace(/\n+$/,'')
 				result.output = result.output.replace(/\n+$/,'')
-				//console.log(`---------${i +1}° teste--------:\nEntrada(s) de teste:\n${options.stdin}Saída esperada p/ teste:\n${results[i].output}\nSaída do seu programa:\n${results[i].saidaResposta}\n-------fim da execução-----\n\n`);
 		    	if(linguagem==='javascript'){
 		    		erro = resp_teste.stderr?trataErroJS(resp_teste.stderr):''
 		    	}
@@ -87,9 +81,6 @@ class SubmissionController{
 		    	}
 		    	if(erro || resp_teste.errorType){
 		    		algumErro = true
-		    		//console.log('---tipo do erro---');
-		    		//console.log(`${erro}\nerrorType: ${resp_teste.errorType}`);
-		    		//console.log('-------------------');
 			    	result.stderr = erro;
 			    	result.errorType = resp_teste.errorType;
 			    	result.exitCode = resp_teste.exitCode;
@@ -104,15 +95,10 @@ class SubmissionController{
 
 		    	return result
 		    })
-		    console.log('--resp_testes:--');
-		    console.log(results);
-		    //console.log(results)
 		    const percentualAcerto = (totalCertas/totalTestes*100).toFixed(2)
 			//verifica se todos os erros são iguais, para mostrar só um erro e não o mesmo erro para cada caso de teste
 			descriptionErro = algumErro && todosIguais(results.map(result=>result.descriptionErro))?results[0].descriptionErro:false
 		    
-		    const end = new Date()
-		    console.log(`tempo gasto: ${((end-begin)/1000).toFixed(2)} s`);
 	    	return res.status(200).json({results,percentualAcerto,descriptionErro})
     	}
     	catch(err){
