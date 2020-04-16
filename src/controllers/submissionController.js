@@ -3,13 +3,12 @@ const trataCodigoJS = require('../util/trataCodigoJS')
 const todosIguais = require('../util/todosIguais')
 const trataErroCPP = require('../util/trataErroCPP')
 const trataErroJS = require('../util/trataErroJS')
-const path = require('path')
 const {URL_GCC} = require('../env')
 
 class SubmissionController{
     async exec(req,res){
     	try{
-    		const begin = new Date()
+    		//const begin = new Date()
 
 			let { codigo,linguagem,results } = req.body;
 			let totalTestes = results.length
@@ -22,6 +21,7 @@ class SubmissionController{
 
 		    //execuções assíncronas
 		    resp_testes = await Promise.all(results.map((result,i)=>{
+				
 		    	if(linguagem==='javascript'){
 					return node.runSource(trataCodigoJS(codigo,result.inputs),{
 				    	timeout : timeout,

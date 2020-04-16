@@ -21,8 +21,6 @@ require('./routes')(app)
 
 var httpsServer = https.createServer(credentials, app);
 
-var httpServer = http.createServer(app);
-
-//httpServer.listen(3001, () => console.log('http on 3001'));
+// var httpServer = http.createServer(app);
 
 httpsServer.listen(443, () => console.log('https on 443'));
