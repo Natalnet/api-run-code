@@ -1,11 +1,6 @@
 var fs = require('fs');
 var http = require('http');
-var https = require('https');
-var privateKey  = fs.readFileSync('/etc/letsencrypt/live/exec.lop.ect.ufrn.br/privkey.pem', 'utf8');
-var certificate = fs.readFileSync('/etc/letsencrypt/live/exec.lop.ect.ufrn.br/fullchain.pem', 'utf8');
-var chain = fs.readFileSync('/etc/letsencrypt/live/exec.lop.ect.ufrn.br/chain.pem', 'utf8');
 
-var credentials = {key: privateKey, cert: certificate, ca: chain};
 var express = require('express');
 var bodyParser = require('body-parser')
 var cors = require('cors')
@@ -20,8 +15,6 @@ app.use(bodyParser.urlencoded({extended:true}))
 //rotas
 require('./routes')(app)
 
-var httpsServer = https.createServer(credentials, app);
+var httpServer = http.createServer(app);
 
-// var httpServer = http.createServer(app);
-
-httpsServer.listen(3003, () => console.log('https on 3003'));
+httpServer.listen(3003, () => console.log('https on 3003'));
