@@ -24,8 +24,18 @@ const servers = [
 let cur = 0;
 
 
+app.get('/vmstatus', async (req, res) => {
+    let msg = '';
+    for(var i = 0; i < servers.length; ++i) {
+    	const response = await axios.get(servers[i]);
+	msg += servers[i];
+	msg += response.status === 200 ? ': OK' : ': DOWN\n';
+        msg += '<br/>'
+    }
+    res.send(msg);
+})
 
-app.post('/apiCompiler', async (req, res) => {
+app.post('/apiCompiler', (req, res) => {
    
    const options = {
       headers: {
