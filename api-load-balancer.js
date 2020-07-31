@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 const servers = [
 	'http://lop.ect.ufrn.br:3003',
-	'http://exec.lop.ect.ufrn.br:3003',
+	//'http://exec.lop.ect.ufrn.br:3003',
 	//'http://lop.ect.ufrn.br:3003',
 ];
 let cur = 0;
