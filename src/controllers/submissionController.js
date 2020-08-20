@@ -21,18 +21,20 @@ class SubmissionController{
 			
 			//execuções assíncronas
 			//return res.status(500).json({msg:''})
+			console.log(results)
+
 		    resp_testes = await Promise.all(results.map((result,i)=>{
 		    	if(linguagem==='javascript'){
 					return node.runSource(trataCodigoJS(codigo,result.inputs),{
 				    	timeout : timeout,
-				    	stdin   : result.inputs,
+				    	stdin   : result.inputs ,
 				    })
-		    	}
+				}
 		    	else if(linguagem==='cpp'){
 			    	return cpp.runSource(codigo,{
 				    	timeout         : timeout,
 				    	compileTimeout  : 60000,
-				    	stdin           : result.inputs,
+				    	stdin           : result.inputs || undefined,
 				    	compilationPath : URL_GCC
 				    })
 		    	}
