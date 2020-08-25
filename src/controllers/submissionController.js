@@ -3,7 +3,7 @@ const trataCodigoJS = require('../util/trataCodigoJS')
 const todosIguais = require('../util/todosIguais')
 const trataErroCPP = require('../util/trataErroCPP')
 const trataErroJS = require('../util/trataErroJS')
-const {URL_GCC, URL_PYTHON} = require('../env')
+const {URL_GPP, URL_GCC, URL_PYTHON} = require('../env')
 
 class SubmissionController{
     async exec(req,res){
@@ -32,6 +32,14 @@ class SubmissionController{
 				}
 		    	else if(linguagem==='cpp'){
 			    	return cpp.runSource(codigo,{
+				    	timeout         : timeout,
+				    	compileTimeout  : 60000,
+				    	stdin           : result.inputs || undefined,
+				    	compilationPath : URL_GPP
+				    })
+				}
+				else if(linguagem==='c'){
+			    	return c.runSource(codigo,{
 				    	timeout         : timeout,
 				    	compileTimeout  : 60000,
 				    	stdin           : result.inputs || undefined,
@@ -84,7 +92,7 @@ class SubmissionController{
 		    	if(linguagem==='javascript'){
 		    		erro = resp_teste.stderr?trataErroJS(resp_teste.stderr):''
 		    	}
-		    	else if(linguagem==='cpp'){
+		    	else if(linguagem==='cpp' || linguagem==='c'){
 		    		erro = resp_teste.stderr?trataErroCPP(resp_teste.stderr):''
 		    	}
 		    	else if(linguagem==='python'){
