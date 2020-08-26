@@ -3,7 +3,7 @@ const trataCodigoJS = require('../util/trataCodigoJS')
 const todosIguais = require('../util/todosIguais')
 const trataErroCPP = require('../util/trataErroCPP')
 const trataErroJS = require('../util/trataErroJS')
-const {URL_GCC, URL_PYTHON} = require('../env')
+const {URL_GPP, URL_GCC, URL_PYTHON} = require('../env')
 
 class SubmissionController{
     async exec(req,res){
@@ -21,22 +21,29 @@ class SubmissionController{
 			
 			//execuções assíncronas
 			//return res.status(500).json({msg:''})
-			console.log(results)
 
 		    resp_testes = await Promise.all(results.map((result,i)=>{
 		    	if(linguagem==='javascript'){
 					return node.runSource(trataCodigoJS(codigo,result.inputs),{
 				    	timeout : timeout,
 				    	stdin   : result.inputs ,
-				    })
+				    });
 				}
 		    	else if(linguagem==='cpp'){
 			    	return cpp.runSource(codigo,{
 				    	timeout         : timeout,
 				    	compileTimeout  : 60000,
 				    	stdin           : result.inputs || undefined,
+				    	compilationPath : URL_GPP
+				    });
+				}
+				else if(linguagem==='c'){
+			    	return c.runSource(codigo,{
+				    	timeout         : timeout,
+				    	compileTimeout  : 60000,
+				    	stdin           : result.inputs || undefined,
 				    	compilationPath : URL_GCC
-				    })
+				    });
 		    	}
 		    	else if(linguagem==='python'){
 			    	return python.runSource(codigo,{
@@ -84,7 +91,7 @@ class SubmissionController{
 		    	if(linguagem==='javascript'){
 		    		erro = resp_teste.stderr?trataErroJS(resp_teste.stderr):''
 		    	}
-		    	else if(linguagem==='cpp'){
+		    	else if(linguagem==='cpp' || linguagem==='c'){
 		    		erro = resp_teste.stderr?trataErroCPP(resp_teste.stderr):''
 		    	}
 		    	else if(linguagem==='python'){
@@ -92,7 +99,7 @@ class SubmissionController{
 		    	}
 		
 		    	if(erro || resp_teste.errorType){
-		    		algumErro = true
+					algumErro = true
 			    	result.stderr = erro;
 			    	result.errorType = resp_teste.errorType;
 			    	result.exitCode = resp_teste.exitCode;
@@ -104,7 +111,6 @@ class SubmissionController{
 		    	//verifica se a saída de teste bateu com a saída do programa
 				result.isMatch = (result.output === result.saidaResposta) && !(result.descriptionErro);
 		    	totalCertas = result.isMatch? totalCertas + 1: totalCertas
-
 		    	return result
 			})
 			//console.log('results: ',results);
@@ -112,14 +118,13 @@ class SubmissionController{
 		    const percentualAcerto = (totalCertas/totalTestes*100).toFixed(2)
 			//verifica se todos os erros são iguais, para mostrar só um erro e não o mesmo erro para cada caso de teste
 			descriptionErro = algumErro && todosIguais(results.map(result=>result.descriptionErro))?results[0].descriptionErro:false
-		    
-	    	return res.status(200).json({results,percentualAcerto,descriptionErro})
+	    	return res.status(200).json({results,percentualAcerto,descriptionErro});
     	}
     	catch(err){
     		console.log('-------err------');
-    		console.log(err)
+    		console.log(err);
     		console.log('----------------');
-    		return res.status(500).json({err})
+    		return res.status(500).json({err});
     	}
 
 	}
@@ -127,4 +132,4 @@ class SubmissionController{
     
     	
 }
-module.exports = new SubmissionController()
+module.exports = new SubmissionController();
