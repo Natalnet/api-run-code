@@ -21,14 +21,13 @@ class SubmissionController{
 			
 			//execuções assíncronas
 			//return res.status(500).json({msg:''})
-			console.log(results)
 
 		    resp_testes = await Promise.all(results.map((result,i)=>{
 		    	if(linguagem==='javascript'){
 					return node.runSource(trataCodigoJS(codigo,result.inputs),{
 				    	timeout : timeout,
 				    	stdin   : result.inputs ,
-				    })
+				    });
 				}
 		    	else if(linguagem==='cpp'){
 			    	return cpp.runSource(codigo,{
@@ -36,7 +35,7 @@ class SubmissionController{
 				    	compileTimeout  : 60000,
 				    	stdin           : result.inputs || undefined,
 				    	compilationPath : URL_GPP
-				    })
+				    });
 				}
 				else if(linguagem==='c'){
 			    	return c.runSource(codigo,{
@@ -44,7 +43,7 @@ class SubmissionController{
 				    	compileTimeout  : 60000,
 				    	stdin           : result.inputs || undefined,
 				    	compilationPath : URL_GCC
-				    })
+				    });
 		    	}
 		    	else if(linguagem==='python'){
 			    	return python.runSource(codigo,{
@@ -100,7 +99,7 @@ class SubmissionController{
 		    	}
 		
 		    	if(erro || resp_teste.errorType){
-		    		algumErro = true
+					algumErro = true
 			    	result.stderr = erro;
 			    	result.errorType = resp_teste.errorType;
 			    	result.exitCode = resp_teste.exitCode;
@@ -112,7 +111,6 @@ class SubmissionController{
 		    	//verifica se a saída de teste bateu com a saída do programa
 				result.isMatch = (result.output === result.saidaResposta) && !(result.descriptionErro);
 		    	totalCertas = result.isMatch? totalCertas + 1: totalCertas
-
 		    	return result
 			})
 			//console.log('results: ',results);
@@ -120,14 +118,13 @@ class SubmissionController{
 		    const percentualAcerto = (totalCertas/totalTestes*100).toFixed(2)
 			//verifica se todos os erros são iguais, para mostrar só um erro e não o mesmo erro para cada caso de teste
 			descriptionErro = algumErro && todosIguais(results.map(result=>result.descriptionErro))?results[0].descriptionErro:false
-		    
-	    	return res.status(200).json({results,percentualAcerto,descriptionErro})
+	    	return res.status(200).json({results,percentualAcerto,descriptionErro});
     	}
     	catch(err){
     		console.log('-------err------');
-    		console.log(err)
+    		console.log(err);
     		console.log('----------------');
-    		return res.status(500).json({err})
+    		return res.status(500).json({err});
     	}
 
 	}
@@ -135,4 +132,4 @@ class SubmissionController{
     
     	
 }
-module.exports = new SubmissionController()
+module.exports = new SubmissionController();
