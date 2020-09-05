@@ -46,10 +46,14 @@ app.post('/apiCompiler', (req, res) => {
    const options = {
       headers: {
          'Content-Type': 'application/json',	 
-      }
+      },
+      timeout: 10000,
    }
-
-   axios.post(`${servers[cur]}/apiCompiler`, req.body, options).then((response) => res.send(response.data));
+   
+   axios.post(`${servers[cur]}/apiCompiler`, req.body, options)
+		.then((response) => res.send(response.data))
+	        .catch((e) => res.send(e));
+   
 
    cur = (cur + 1) % servers.length;
 })
