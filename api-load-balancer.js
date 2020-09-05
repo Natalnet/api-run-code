@@ -17,9 +17,11 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}))
 
 const servers = [
-	'http://lop.ect.ufrn.br:3003',
-	//'http://exec.lop.ect.ufrn.br:3003',
-	//'http://lop.ect.ufrn.br:3003',
+	'http://10.3.226.137:3003',
+	'http://10.3.226.138:3003',
+	'http://10.3.226.139:3003',
+	'http://10.3.226.140:3003',
+	'http://10.3.226.141:3003',
 ];
 let cur = 0;
 
@@ -27,10 +29,14 @@ let cur = 0;
 app.get('/vmstatus', async (req, res) => {
     let msg = '';
     for(var i = 0; i < servers.length; ++i) {
-    	const response = await axios.get(servers[i]);
-	msg += servers[i];
-	msg += response.status === 200 ? ': OK' : ': DOWN\n';
-        msg += '<br/>'
+	     msg += servers[i];
+	try {
+    	     const response = await axios.get(servers[i]);
+             msg += response.status === 200 ? ': OK' : ': DOWN\n';
+             msg += '<br/>'
+	} catch(e) {
+	     msg += ': DOWN<br/>';
+	}
     }
     res.send(msg);
 })
