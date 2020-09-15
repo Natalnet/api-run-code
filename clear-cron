@@ -1,1 +1,1 @@
-0 4 * * * /usr/bin/sh /usr/local/vm-exec/api-run-code/clear-env.sh
+0 4 * * * /usr/bin/sh /usr/local/vm-exec/clear-env.sh
