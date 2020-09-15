@@ -39,11 +39,12 @@ class SubmissionController{
 				}
 				else if(linguagem==='c'){
 			    	return c.runSource(codigo,{
-				    	timeout         : timeout,
-				    	compileTimeout  : 60000,
-				    	stdin           : result.inputs || undefined,
-				    	compilationPath : URL_GCC
-				    });
+						timeout         : timeout,
+						compileTimeout  : 60000,
+						stdin           : result.inputs || undefined,
+						compilationPath : URL_GCC,
+						compilerArgs : "-lm"
+					});
 		    	}
 		    	else if(linguagem==='python'){
 			    	return python.runSource(codigo,{
@@ -99,6 +100,7 @@ class SubmissionController{
 		    	}
 		
 		    	if(erro || resp_teste.errorType){
+					console.log("error type " + erro + ", " + resp_teste.errorType );
 					algumErro = true
 			    	result.stderr = erro;
 			    	result.errorType = resp_teste.errorType;
