@@ -3,7 +3,7 @@ const trataCodigoJS = require('../util/trataCodigoJS')
 const todosIguais = require('../util/todosIguais')
 const trataErroCPP = require('../util/trataErroCPP')
 const trataErroJS = require('../util/trataErroJS')
-const {URL_GPP, URL_GCC, URL_PYTHON} = require('../env')
+const {URL_GPP, URL_GCC, URL_PYTHON, STDERR_LIMIT, STDOUT_LIMIT} = require('../env')
 
 class SubmissionController{
     async exec(req,res){
@@ -26,7 +26,9 @@ class SubmissionController{
 		    	if(linguagem==='javascript'){
 					return node.runSource(trataCodigoJS(codigo,result.inputs),{
 				    	timeout : timeout,
-				    	stdin   : result.inputs ,
+						stdin   : result.inputs,
+						stdoutLimit : STDOUT_LIMIT,
+						stderrLimit : STDERR_LIMIT
 				    });
 				}
 		    	else if(linguagem==='cpp'){
@@ -34,7 +36,9 @@ class SubmissionController{
 				    	timeout         : timeout,
 				    	compileTimeout  : 60000,
 				    	stdin           : result.inputs || undefined,
-				    	compilationPath : URL_GPP
+						compilationPath : URL_GPP,
+						stdoutLimit : STDOUT_LIMIT,
+						stderrLimit : STDERR_LIMIT
 				    });
 				}
 				else if(linguagem==='c'){
@@ -43,14 +47,18 @@ class SubmissionController{
 						compileTimeout  : 60000,
 						stdin           : result.inputs || undefined,
 						compilationPath : URL_GCC,
-						compilerArgs : "-lm"
+						compilerArgs : "-lm",
+						stdoutLimit : STDOUT_LIMIT,
+						stderrLimit : STDERR_LIMIT
 					});
 		    	}
 		    	else if(linguagem==='python'){
 			    	return python.runSource(codigo,{
 						timeout        : timeout,
 						executionPath  : URL_PYTHON,
-				    	stdin          : result.inputs,
+						stdin          : result.inputs,
+						stdoutLimit : STDOUT_LIMIT,
+						stderrLimit : STDERR_LIMIT
 				    });
 		    	}
 		    }))
@@ -100,7 +108,7 @@ class SubmissionController{
 		    	}
 		
 		    	if(erro || resp_teste.errorType){
-					console.log("error type " + erro + ", " + resp_teste.errorType );
+					//console.log("error type " + erro + ", " + resp_teste.errorType );
 					algumErro = true
 			    	result.stderr = erro;
 			    	result.errorType = resp_teste.errorType;
