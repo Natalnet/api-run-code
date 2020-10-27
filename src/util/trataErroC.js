@@ -4,13 +4,20 @@ const {STDERR_LIMIT} = require('../env')
 
 function getStack(lineReader, files){
     let stack = "";
+
+    let fileNames = [];
+    
+    files.forEach(element => {
+        let vec = element.split('/');
+        element = vec[vec.length - 1]; //pega apenas o nome do arquivo
+        fileNames.push(vec[vec.length - 1]);
+    });
+
+
     /*stack trace
       formato #0 0x4c3e65 in test_13 /...././tests/c/errors.c:155:12
               ^^             ^^^^^^^                          ^^^^^^
     */
-    let filesRegex = files.join(')|('); //cria uma regex contendo todos os arquivos compilados
-    filesRegex = `(${filesRegex})`;
-
     let stack_count = 0;
     while (line = lineReader.next()) {
         let line_text = line.toString('ascii');
@@ -18,25 +25,24 @@ function getStack(lineReader, files){
         
         //apenas conta stacks que tenham os nomes dos arquivos compilados, 
         //excluindo assim os binários gerados na compilaçao
-        if(/.*#\d+.*/.test(line_text) && line_text.match(filesRegex) != null){
+        if(/.*#\d+.*/.test(line_text) && line_text.search(fileNames[0]) != -1){
             let stackNumber = `#${stack_count++}` ;
         
             let function_ = /in \w+/.exec(line_text);
-            function_ = function_.toString().slice(3); //remove o 'in '
+            if(!function_) //sometimes there is only function addresses
+                continue;
+            else{
+                function_ = function_.toString().slice(3); //remove o 'in '
 
-            //console.log("stack found " + file_name);
-            let line_info = /:\d+:\d+/.exec(line_text);
+                //console.log("stack found " + file_name);
+                let line_info = /:\d+/.exec(line_text);
 
-            //console.log("stack found " + `${stackNumber} ${function_}${line_info}`);
-            stack += `${stackNumber} ${function_}${line_info}\n`;
+                //console.log("stack found " + `${stackNumber} ${function_}${line_info}`);
+                stack += `${stackNumber} ${function_}${line_info}\n`;
+            }
             
             if(function_ == 'main')
                 break;
-            else if(stack.length >= STDERR_LIMIT){
-                stack = stack.slice(0, stack.length-4);
-                stack = `${stack}\n...`;
-                break;
-            }
         }
     }
     return stack;
