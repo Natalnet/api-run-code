@@ -3,133 +3,93 @@ const {URL_GPP, URL_GCC, URL_PYTHON} = require('./src/env');
 const fs = require('fs');
 const xml2js = require('xml2js');
 const util = require('util');
+const LineReader = require('n-readlines');
 
-function processStack(stackFrames, programObj){
-    let stackTrace = [];
-    firstFrame = stackFrames[0]; //analisa apenas o primeiro frame
-    for(let i=0; i < firstFrame.frame.length; i++){
-        //console.log(frame_e.frame[i].obj[0]);
-        //console.log(programObj);
+
+
+
+
+
+function getStack(lineReader, files){
+    let stack = "";
+    /*stack trace
+      formato #0 0x4c3e65 in test_13 /...././tests/c/errors.c:155:12
+              ^^             ^^^^^^^                          ^^^^^^
+    */
+    let filesRegex = files.join(')|('); //cria uma regex contendo todos os arquivos compilados
+    filesRegex = `(${filesRegex})`;
+
+    let stack_count = 0;
+    while (line = lineReader.next()) {
+        let line_text = line.toString('ascii');
+        //console.log(line_text + '\n' + filesRegex);
         
-        if(firstFrame.frame[i].obj[0] === programObj){ //only consider entries that have an associated file, thus it will ignore std libs entries
-            stackTrace.push(`${firstFrame.frame[i].fn}:${firstFrame.frame[i].line}`);
+        //apenas conta stacks que tenham os nomes dos arquivos compilados, 
+        //excluindo assim os binários gerados na compilaçao
+        if(/.*#\d+.*/.test(line_text) && line_text.match(filesRegex) != null){
+            let stackNumber = `#${stack_count++}` ;
+        
+            let function_ = /in \w+/.exec(line_text);
+            function_ = function_.toString().slice(3); //remove o 'in '
+
+            //console.log("stack found " + file_name);
+            let line_info = /:\d+:\d+/.exec(line_text);
+
+            //console.log("stack found " + `${stackNumber} ${function_}${line_info}`);
+            stack += `${stackNumber} ${function_}${line_info}\n`;
+            
+            if(function_ == 'main')
+                break;
         }
-    }  
-    return stackTrace;
+    }
+    return stack;
 }
 
-/*
-* recebe um elemento fatal_signal do valgrind e retorna uma lista com posições no código
-* no formato signame : {stack : [funcao:linha, ...]}
-* signame é o nome do signal recebido 'SIGINT', etc
-* para um vetor com o stack até a função main é retornado. O stack vai da função mais interna para a mais externa
-*/
-function processFatalSignal(fatal_signal, programObj){
-    console.log(fatal_signal.signame);
-    let stackTrace = processStack(fatal_signal.stack, programObj);
-    console.log(stackTrace);
-}
+function getErrorInfo(debugReportFile, verbose, files){
+    let lines = new LineReader(debugReportFile);
 
-/*
-* recebe uma lista de erros do valgrind e retorna uma lista com posições no código
-* no formato erro : {stack : [funcao:linha, ...]}
-* erro pode ser InvalidWrite ou InvalidRead
-* para cada erro um vetor com o stack até a função main é retornado. O stack vai da função mais interna para a mais externa
-*/
-function processErrors(errors, programObj){
-    let errorSet = new Set();
-    errors.forEach(error => {
-        if(error.kind == 'InvalidWrite'){ //add invalid read
-            let stackTrace = processStack(error.stack, programObj);
-            let errorEntry = {};
-            errorEntry[error.kind] = {'stack' : stackTrace, 'what' : error.what};
-            errorSet.add(JSON.stringify(errorEntry));
+    let line;
+    let summary = '';  //resumo do erro
+ 
+    if (verbose){  
+        while (line = lines.next()) {
+            let line_text = line.toString('ascii');
+            if(verbose)
+                console.log(line_text);
         }
-        else if(error.kind == 'InvalidRead'){
-            let stackTrace = processStack(error.stack, programObj);
-            let errorEntry = {};
-            errorEntry[error.kind] = {'stack' : stackTrace, 'what' : error.what};
-            errorSet.add(JSON.stringify(errorEntry));
-        }
-        else if(error.kind == 'UninitValue'){
-            processStack(error.stack, programObj);
-            let stackTrace = processStack(error.stack, programObj);
-            let errorEntry = {}
-            errorEntry[error.kind] = {'stack' : stackTrace, 'what' : error.what};
-            errorSet.add(JSON.stringify(errorEntry));
-            //console.log(stackTrace);
-        }
-        else if(error.kind == 'UninitCondition'){
-            processStack(error.stack, programObj);
-            let stackTrace = processStack(error.stack, programObj);
-            let errorEntry = {};
-            errorEntry[error.kind] = {'stack' : stackTrace, 'what' : error.what};
-            errorSet.add(JSON.stringify(errorEntry));
-            //console.log(stackTrace);
-        }
-        else if(error.kind == 'Leak_DefinitelyLost'){
-            processStack(error.stack, programObj);
-            let stackTrace = processStack(error.stack, programObj);
-            let errorEntry = {};
-            errorEntry[error.kind] = {'stack' : stackTrace, 'what' : error.what};
-            errorSet.add(JSON.stringify(errorEntry));
-        }
-        else if(error.kind == 'MismatchedFree'){ //new > free ao invés de delete || new > delete ao invés de delte[]
-            processStack(error.stack, programObj);
-            let stackTrace = processStack(error.stack, programObj);
-            let errorEntry = {};
-            errorEntry[error.kind] = {'stack' : stackTrace, 'what' : error.what};
-            errorSet.add(JSON.stringify(errorEntry));
-        }
-        else if(error.kind == 'InvalidFree'){
-            processStack(error.stack, programObj);
-            let stackTrace = processStack(error.stack, programObj);
-            let errorEntry = {};
-            errorEntry[error.kind] = {'stack' : stackTrace, 'what' : error.what};
-            errorSet.add(JSON.stringify(errorEntry));
-        }
-        else if(error.kind == 'SyscallParam'){
-            processStack(error.stack, programObj);
-            let stackTrace = processStack(error.stack, programObj);
-            let errorEntry = {};
-            errorEntry[error.kind] = {'stack' : stackTrace, 'what' : error.what};
+        console.log("Processing Error!");
+        lines = new LineReader(debugReportFile);
+    }
+        
+    while (line = lines.next()) {
+        let line_text = line.toString('ascii');
+        if(verbose)
+            console.log(line_text);
 
-            errorSet.add(JSON.stringify(errorEntry));
-        }
-
-    });
-    console.log(errorSet);
-}
-
-
-function getErrors(debugReportFile, verbose){
-    //let error = {memory : {}};
-    const xml = fs.readFileSync(debugReportFile);
-
-    // convert XML to JSON
-    xml2js.parseString(xml, { mergeAttrs: true }, (err, result) => {
-            if (err) {
-                throw err;
+        /*primeira parte
+            formato ==9711==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x0000004c3e65 bp 0x7fff25db6a30 sp 0x7fff25db6a20 T0)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        */
+        if(/.*==ERROR: AddressSanitizer:*/.test(line_text)){ //address Sanitizer errors
+            let error = /ERROR: AddressSanitizer:.*on/.exec(line_text); //alguns erros tem "on" outros não, então testo primeiro se tem on
+            if(error)
+                error = `${error.toString().slice(0,-3)}`; //remove o 'on'
+            else{
+                error = /ERROR: AddressSanitizer:.*:/.exec(line_text);
+                error = `${error.toString().slice(0,-1)}`; //remove o ':'
             }
-            if(verbose = true)
-                console.log(util.inspect(result, {colors:true, depth:10}));
-            
-            var programObj = result.valgrindoutput.args[0].argv[0].exe[0];
-            console.log(programObj);
-            
-            var fatal_signal = result.valgrindoutput.fatal_signal;
-            if(fatal_signal){
-                processFatalSignal(fatal_signal[0]);
-            }
-            var errors = result.valgrindoutput.error;
-            if(errors){ //mermory related errors
-                processErrors(errors, programObj);
-            }
-            
-            //errs = getErrors(result);
-            
-            //console.log(util.inspect(result, {depth:Infinity, colors:true}));
-    });
+            summary += `${error}\n`;
+            summary += getStack(lines, files);
+        }
+        else if(/.*==ERROR: LeakSanitizer/.test(line_text)){ //leak Sanitizer errors
+            let error = /ERROR: LeakSanitizer:.*/.exec(line_text);
+            summary += `${error.toString()}\n`;
+            summary += getStack(lines, files);
+        }
+        
+    }
+    
+    return summary;
 
 }
 
@@ -144,7 +104,7 @@ async function testCPPFiles(){
                             //stdin : "2",
                             //stdin : "3",
                             //stdin : "4", //não mostrou erros
-                            stdin : "7", //overlap src e dest in memcpy, nao gerou erro!
+                            //stdin : "7", //overlap src e dest in memcpy, nao gerou erro!
                             //stdin : "9 dfaasdfhasdkfçjsaçdffaçldjfasflas fasdfas",
 
                             compilationPath : URL_GPP,
@@ -159,7 +119,9 @@ async function testCPPFiles(){
         console.log("result");
         console.log(result);//result object
         if(result.debuggerReportFile){
-            getErrors(result.debuggerReportFile, false);
+            
+            let error = getErrors(result.debuggerReportFile, false);
+            //console.log(error);
         }
     })
     .catch(err => {
@@ -172,16 +134,28 @@ async function testCPPFiles(){
         
 
 async function testCFiles(){
-    let p = c.runFile("./tests/c/test2.c",
+    let p = c.runFile("./tests/c/errors.c",
     {
         timeout : 3000,
         compileTimeout  : 60000,
-        stdin : "3",  
-        compilationPath : URL_GCC,
-        compilerArgs : "-lm",
+        //stdin : "1",
+        //stdin : "2",
+        //stdin : "3",
+        //stdin : "4",
+        //stdin : "5",
+        //stdin : "6",
+        //stdin : "7",
+        //stdin : "8",
+        //stdin : "9",
+        //stdin : "10",
+        //stdin : "11",
+        //stdin : "12",
+        stdin : "13",
+        compilerPath : URL_GCC,
+        compilerArgs : ['-lm'],
         stderrLimit : 2000,
         stdoutLimit : 2000,
-        debugger : true
+        addressSanitizer : true
     });
 
 
@@ -189,7 +163,10 @@ async function testCFiles(){
         console.log("result");
         console.log(result);//result object
         if(result.debuggerReportFile){
-            getErrors(result.debuggerReportFile);
+            //console.log(result.debuggerReportFile);
+            let errorSumary = getErrorInfo(result.debuggerReportFile, true, result.files);
+            console.log("Error Summary");
+            console.log(errorSumary.toString());
         }
     })
     .catch(err => {
@@ -199,5 +176,5 @@ async function testCFiles(){
     await p;
 }
 
-//testCFiles();
-testCPPFiles();
+testCFiles();
+//testCPPFiles();
