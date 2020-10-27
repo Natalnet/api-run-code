@@ -2,8 +2,11 @@
 #include <math.h>
 
 int main(){
-    printf("%lf\n", sqrt(8));
-    printf("%lf\n", pow(2,3));
+    int a, b, c;
+    scanf("%i %i %i", &a, &b, &c);
+    printf("a=%d b=%d c=%d\n", a, b, c);
+    printf("%lf\n", sqrt(a));
+    printf("%lf\n", pow(b,c));
     while(1){
         printf("é nois!\n");
     }

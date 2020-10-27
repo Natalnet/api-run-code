@@ -1,8 +1,9 @@
-const {c, cpp, node, python, java} = require('compile-run')
-const trataCodigoJS = require('../util/trataCodigoJS')
-const todosIguais = require('../util/todosIguais')
-const trataErroCPP = require('../util/trataErroCPP')
-const trataErroJS = require('../util/trataErroJS')
+const {c, cpp, node, python, java} = require('compile-run');
+const trataCodigoJS = require('../util/trataCodigoJS');
+const todosIguais = require('../util/todosIguais');
+const trataErroCPP = require('../util/trataErroCPP');
+const trataErroJS = require('../util/trataErroJS');
+const trataErroC = require('../util/trataErroC');
 const {URL_GPP, URL_GCC, URL_PYTHON, STDERR_LIMIT, STDOUT_LIMIT} = require('../env')
 
 class SubmissionController{
@@ -36,7 +37,7 @@ class SubmissionController{
 				    	timeout         : timeout,
 				    	compileTimeout  : 60000,
 				    	stdin           : result.inputs || undefined,
-						compilationPath : URL_GPP,
+						compilerPath : URL_GPP,
 						stdoutLimit : STDOUT_LIMIT,
 						stderrLimit : STDERR_LIMIT
 				    });
@@ -46,10 +47,11 @@ class SubmissionController{
 						timeout         : timeout,
 						compileTimeout  : 60000,
 						stdin           : result.inputs || undefined,
-						compilationPath : URL_GCC,
-						compilerArgs : "-lm",
+						compilerPath : URL_GCC,
+						compilerArgs : ['-lm'],
 						stdoutLimit : STDOUT_LIMIT,
-						stderrLimit : STDERR_LIMIT
+						stderrLimit : STDERR_LIMIT,
+						addressSanitizer : true
 					});
 		    	}
 		    	else if(linguagem==='python'){
@@ -100,15 +102,18 @@ class SubmissionController{
 		    	if(linguagem==='javascript'){
 		    		erro = resp_teste.stderr?trataErroJS(resp_teste.stderr):''
 		    	}
-		    	else if(linguagem==='cpp' || linguagem==='c'){
-		    		erro = resp_teste.stderr?trataErroCPP(resp_teste.stderr):''
-		    	}
+		    	else if(linguagem==='cpp'){
+		    		erro = resp_teste.stderr ? trataErroCPP(resp_teste.stderr):''
+				}
+				else if(linguagem==='c'){
+					erro = resp_teste.debuggerReportFile ? trataErroC.getErrorInfo(resp_teste.debuggerReportFile, false, resp_teste.files):'';
+				}
 		    	else if(linguagem==='python'){
 		    		erro = resp_teste.stderr || ''
 		    	}
 		
 		    	if(erro || resp_teste.errorType){
-					//console.log("error type " + erro + ", " + resp_teste.errorType );
+					//console.log("errosr type " + erro + ", " + resp_teste.errorType );
 					algumErro = true
 			    	result.stderr = erro;
 			    	result.errorType = resp_teste.errorType;
