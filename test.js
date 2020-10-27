@@ -1,8 +1,5 @@
 const {c, cpp, node, python, java} = require('compile-run');
 const {URL_GPP, URL_GCC, URL_PYTHON} = require('./src/env');
-const fs = require('fs');
-const xml2js = require('xml2js');
-const util = require('util');
 const LineReader = require('n-readlines');
 const trataErroC = require('./src/util/trataErroC');
 
