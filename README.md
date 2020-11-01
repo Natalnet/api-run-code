@@ -11,10 +11,14 @@ sudo docker build --tag plataformalop/vm-exec:<version> .
 ## push docker image to repo
 
 sudo docker push plataformalop/vm-exec:<version>
+  
+## stop all containers
+
+sudo docker container stop $(docker container ls -aq)
 
 ## run container
 
-sudo docker run -d --restart=unless-stopped -p 3003:3003 --name vm-exec plataformalop/vm-exec:<version>
+sudo docker run -d --restart=unless-stopped -p 3003:3003 plataformalop/vm-exec:<version>
 
 ## open bash into docker container
 
