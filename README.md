@@ -1,5 +1,9 @@
 # api-run-code
 
+## login
+
+sudo docker login --username plataformalop
+
 ## build docker image
 
 sudo docker build --tag plataformalop/vm-exec:<version> .
