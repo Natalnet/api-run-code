@@ -2,11 +2,11 @@
 
 ## build docker image
 
-sudo docker build --tag igorosberg/lop-vm-exec:<version> .
+sudo docker build --tag plataformalop/vm-exec:<version> .
 
 ## push docker image to repo
 
-sudo docker push igorosberg/lop-vm-exec:<version>
+sudo docker push plataformalop/vm-exec:<version>
 
 ## run container
 
