@@ -14,7 +14,11 @@ sudo docker push plataformalop/vm-exec:<version>
   
 ## stop all containers
 
-sudo docker container stop $(docker container ls -aq)
+sudo docker container stop $(sudo docker container ls -aq) && sudo docker container rm $(sudo docker container ls -aq)
+
+## see processes using ports 3003
+
+sudo lsof -i :3003 | grep LISTEN
 
 ## run container
 
