@@ -106,7 +106,10 @@ class SubmissionController{
 		    		erro = resp_teste.stderr ? trataErroCPP(resp_teste.stderr):''
 				}
 				else if(linguagem==='c'){
-					erro = resp_teste.debuggerReportFile ? trataErroC.getErrorInfo(resp_teste.debuggerReportFile, false, resp_teste.files):'';
+					if(resp_teste.errorType === 'run-time')
+						erro = resp_teste.debuggerReportFile ? trataErroC.getErrorInfo(resp_teste.debuggerReportFile, false, resp_teste.files):'';
+					else
+						erro = resp_teste.stderr ? trataErroCPP(resp_teste.stderr):'';
 				}
 		    	else if(linguagem==='python'){
 		    		erro = resp_teste.stderr || ''
