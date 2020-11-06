@@ -38,6 +38,7 @@ class SubmissionController{
 				    	compileTimeout  : 60000,
 				    	stdin           : result.inputs || undefined,
 						compilerPath : URL_GPP,
+						compilerArgs : ['-lm'],
 						stdoutLimit : STDOUT_LIMIT,
 						stderrLimit : STDERR_LIMIT
 				    });
