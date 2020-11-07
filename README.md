@@ -6,7 +6,7 @@ sudo docker login --username plataformalop
 
 ## build docker image
 
-sudo docker build --tag plataformalop/vm-exec:<version> .
+sudo docker build --tag plataformalop/vm-exec:<version> --tag plataformalop/vm-exec:latest .
 
 ## push docker image to repo
 
