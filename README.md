@@ -22,7 +22,7 @@ sudo lsof -i :3003 | grep LISTEN
 
 ## run container
 
-sudo docker run -d --restart=unless-stopped -p 3003:3003 plataformalop/vm-exec:<version>
+sudo docker run -d --restart=unless-stopped --name vm-exec -p 3003:3003 plataformalop/vm-exec:<version>
 
 ## open bash into docker container
 
