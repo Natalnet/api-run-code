@@ -63,6 +63,16 @@ class SubmissionController{
 						stdoutLimit : STDOUT_LIMIT,
 						stderrLimit : STDERR_LIMIT
 				    });
+				}
+				else if(linguagem==='java'){
+			    	return java.runSource(codigo,{
+						timeout        : timeout,
+						compilationPath: URL_JAVAC,
+    					executionPath: URL_JAVA,
+						stdin          : result.inputs,
+						stdoutLimit : STDOUT_LIMIT,
+						stderrLimit : STDERR_LIMIT
+				    });
 		    	}
 		    }))
 		    
