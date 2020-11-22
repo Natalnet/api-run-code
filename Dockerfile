@@ -8,6 +8,8 @@ RUN apt-get install -y cron
 RUN npm install -g yarn pm2
 RUN apt install -y python3-pip
 RUN pip3 install scipy numpy
+#java 11
+RUN apt install default-jdk
 RUN mkdir -p /usr/local/vm-exec
 COPY . /usr/local/vm-exec
 EXPOSE 3003
