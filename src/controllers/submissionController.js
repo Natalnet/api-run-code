@@ -4,7 +4,8 @@ const todosIguais = require('../util/todosIguais');
 const trataErroCPP = require('../util/trataErroCPP');
 const trataErroJS = require('../util/trataErroJS');
 const trataErroC = require('../util/trataErroC');
-const {URL_GPP, URL_GCC, URL_PYTHON, STDERR_LIMIT, STDOUT_LIMIT} = require('../env')
+const trataErroJava = require('../util/trateErroJava');
+const {URL_JAVAC, URL_JAVA, URL_GPP, URL_GCC, URL_PYTHON, STDERR_LIMIT, STDOUT_LIMIT} = require('../env')
 
 class SubmissionController{
     async exec(req,res){
@@ -65,6 +66,9 @@ class SubmissionController{
 				    });
 				}
 				else if(linguagem==='java'){
+					//console.log("running java");
+					//console.log(codigo);
+
 			    	return java.runSource(codigo,{
 						timeout        : timeout,
 						compilationPath: URL_JAVAC,
@@ -110,7 +114,7 @@ class SubmissionController{
 		    	//retira os caractere especiais '\n' do final do código'
 				result.saidaResposta = result.saidaResposta.replace(/\n+$/,'')
 				result.output = result.output.replace(/\n+$/,'')
-		    	if(linguagem==='javascript'){
+				if(linguagem==='javascript'){
 		    		erro = resp_teste.stderr?trataErroJS(resp_teste.stderr):''
 		    	}
 		    	else if(linguagem==='cpp'){
@@ -124,7 +128,13 @@ class SubmissionController{
 				}
 		    	else if(linguagem==='python'){
 		    		erro = resp_teste.stderr || ''
-		    	}
+				}
+				else if(linguagem==='java'){
+					if(resp_teste.errorType === 'compile-time')
+						erro = resp_teste.stderr ? trataErroJava.getErrorInfo(resp_teste.stderr, false):'';
+					else
+						erro = resp_teste.stderr;
+				}
 		
 		    	if(erro || resp_teste.errorType){
 					//console.log("errosr type " + erro + ", " + resp_teste.errorType );
