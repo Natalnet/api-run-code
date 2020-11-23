@@ -52,8 +52,8 @@ class SubmissionController{
 						compilerPath : URL_GCC,
 						compilerArgs : ['-lm'],
 						stdoutLimit : STDOUT_LIMIT,
-						stderrLimit : STDERR_LIMIT,
-						addressSanitizer : true
+						stderrLimit : STDERR_LIMIT
+						//addressSanitizer : true
 					});
 		    	}
 		    	else if(linguagem==='python'){
