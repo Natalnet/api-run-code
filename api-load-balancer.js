@@ -1,29 +1,32 @@
 var fs = require('fs');
 var https = require('https');
 var axios = require('axios');
-var privateKey  = fs.readFileSync('/etc/letsencrypt/live/exec.lop.ect.ufrn.br/privkey.pem', 'utf8');
-var certificate = fs.readFileSync('/etc/letsencrypt/live/exec.lop.ect.ufrn.br/fullchain.pem', 'utf8');
-var chain = fs.readFileSync('/etc/letsencrypt/live/exec.lop.ect.ufrn.br/chain.pem', 'utf8');
+
+var PRIVATEKEY = process.env.PRIVATEKEY || '<local_da_chave>';
+var FULLCHAIN = process.env.FULLCHAIN || '<local_da_chave>';
+var CHAIN = process.env.CHAIN || '<local_da_chave>';
+
+
+
+var privateKey  = fs.readFileSync(PRIVATEKEY, 'utf8');
+var certificate = fs.readFileSync(FULLCHAIN, 'utf8');
+var chain = fs.readFileSync(CHAIN, 'utf8');
 
 var credentials = {key: privateKey, cert: certificate, ca: chain};
 var express = require('express');
-var bodyParser = require('body-parser')
-var cors = require('cors')
+var bodyParser = require('body-parser');
+var cors = require('cors');
 
 var app = express();
 
-app.use(cors())
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended:true}))
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}));
 
-const servers = [
-	'http://10.3.226.137:3003',
-	'http://10.3.226.138:3003',
-	'http://10.3.226.139:3003',
-	'http://10.3.226.140:3003',
-	'http://10.3.226.141:3003',
-];
+const servers = process.env.SERVERS.split(',');
+
 let cur = 0;
+
 
 
 app.get('/vmstatus', async (req, res) => {
