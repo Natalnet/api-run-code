@@ -68,4 +68,4 @@ app.post('/apiCompiler', (req, res) => {
 
 var httpsServer = https.createServer(credentials, app);
 
-httpsServer.listen(process.env.LOAD_BALANCER_PORT, () => console.log('https on 443'));
+httpsServer.listen(process.env.LOAD_BALANCER_PORT, () => console.log(`https on ${process.env.LOAD_BALANCER_PORT}`));
