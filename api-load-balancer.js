@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var fs = require('fs');
 var https = require('https');
 var axios = require('axios');
