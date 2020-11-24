@@ -10,6 +10,8 @@ var CHAIN = process.env.CHAIN || '<local_da_chave>';
 
 
 
+
+
 var privateKey  = fs.readFileSync(PRIVATEKEY, 'utf8');
 var certificate = fs.readFileSync(FULLCHAIN, 'utf8');
 var chain = fs.readFileSync(CHAIN, 'utf8');
@@ -66,4 +68,4 @@ app.post('/apiCompiler', (req, res) => {
 
 var httpsServer = https.createServer(credentials, app);
 
-httpsServer.listen(443, () => console.log('https on 443'));
+httpsServer.listen(process.env.LOAD_BALANCER_PORT, () => console.log('https on 443'));
