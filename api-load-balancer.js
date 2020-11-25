@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var fs = require('fs');
 var https = require('https');
 var axios = require('axios');
@@ -5,6 +7,8 @@ var axios = require('axios');
 var PRIVATEKEY = process.env.PRIVATEKEY || '<local_da_chave>';
 var FULLCHAIN = process.env.FULLCHAIN || '<local_da_chave>';
 var CHAIN = process.env.CHAIN || '<local_da_chave>';
+
+
 
 
 
@@ -64,4 +68,4 @@ app.post('/apiCompiler', (req, res) => {
 
 var httpsServer = https.createServer(credentials, app);
 
-httpsServer.listen(443, () => console.log('https on 443'));
+httpsServer.listen(process.env.LOAD_BALANCER_PORT, () => console.log(`https on ${process.env.LOAD_BALANCER_PORT}`));
