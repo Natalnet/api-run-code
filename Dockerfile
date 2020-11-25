@@ -1,15 +1,14 @@
 FROM ubuntu
-RUN apt-get update
-RUN apt-get install -y nodejs
-RUN apt-get install -y g++
-RUN apt-get install -y python3
-RUN apt-get install -y npm
-RUN apt-get install -y cron
-RUN npm install -g yarn pm2
-RUN apt install -y python3-pip
+RUN apt-get update && apt-get install -y nodejs 
+RUN apt-get update && apt-get install -y npm
+RUN apt-get update && apt-get install -y g++
+RUN apt-get update && apt-get install -y python3
+RUN apt-get update && apt-get install -y npm
+RUN apt-get update && apt-get install -y cron
+RUN apt-get update && apt-get install -y python3-pip
+RUN apt-get update && apt-get install -y openjdk-11-jdk
+#RUN npm install -g yarn pm2
 RUN pip3 install scipy numpy
-#java 11
-RUN apt install default-jdk
 RUN mkdir -p /usr/local/vm-exec
 COPY . /usr/local/vm-exec
 EXPOSE 3003
