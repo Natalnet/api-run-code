@@ -14,7 +14,7 @@ COPY . /usr/local/vm-exec
 EXPOSE 3003
 WORKDIR /usr/local/vm-exec
 RUN cd /usr/local/vm-exec
-RUN npm install --dotenv-extended
+#RUN npm install --dotenv-extended
 RUN npm install
 COPY clear-cron /etc/cron.d/clear-cron
 RUN chmod 0644 /etc/cron.d/clear-cron
