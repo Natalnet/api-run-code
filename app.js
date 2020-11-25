@@ -18,4 +18,4 @@ require('./routes')(app)
 
 var httpServer = http.createServer(app);
 
-httpServer.listen(3003, () => console.log('https on 3003'));
+httpServer.listen(3003, () => console.log('http on 3003'));

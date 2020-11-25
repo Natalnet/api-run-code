@@ -5,7 +5,14 @@ const trataErroCPP = require('../util/trataErroCPP');
 const trataErroJS = require('../util/trataErroJS');
 const trataErroC = require('../util/trataErroC');
 const trataErroJava = require('../util/trateErroJava');
-const {URL_JAVAC, URL_JAVA, URL_GPP, URL_GCC, URL_PYTHON, STDERR_LIMIT, STDOUT_LIMIT} = require('../env')
+
+const URL_JAVAC = process.env.URL_JAVAC;
+const URL_JAVA = process.env.URL_JAVA;
+const URL_GPP = process.env.URL_GPP;
+const URL_GCC = process.env.URL_GCC;
+const URL_PYTHON = process.env.URL_PYTHON;
+const STDERR_LIMIT = process.env.STDERR_LIMIT;
+const STDOUT_LIMIT = process.env.STDOUT_LIMIT;
 
 class SubmissionController{
     async exec(req,res){

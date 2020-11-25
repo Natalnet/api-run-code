@@ -1,5 +1,5 @@
 const LineReader = require('n-readlines');
-const {STDERR_LIMIT} = require('../env')
+const STDERR_LIMIT = process.env.STDERR_LIMIT;
 
 function getErrorInfo(erro, verbose){ //limpa o nome do arquivo para evitar confusão
  

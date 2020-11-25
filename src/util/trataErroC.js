@@ -1,6 +1,6 @@
 const util = require('util');
 const LineReader = require('n-readlines');
-const {STDERR_LIMIT} = require('../env')
+const {STDERR_LIMIT} = process.env.STDERR_LIMIT;
 
 function getStack(lineReader, files){
     let stack = "";

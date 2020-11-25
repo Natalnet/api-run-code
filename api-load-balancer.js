@@ -8,10 +8,6 @@ var PRIVATEKEY = process.env.PRIVATEKEY || '<local_da_chave>';
 var FULLCHAIN = process.env.FULLCHAIN || '<local_da_chave>';
 var CHAIN = process.env.CHAIN || '<local_da_chave>';
 
-
-
-
-
 var privateKey  = fs.readFileSync(PRIVATEKEY, 'utf8');
 var certificate = fs.readFileSync(FULLCHAIN, 'utf8');
 var chain = fs.readFileSync(CHAIN, 'utf8');
